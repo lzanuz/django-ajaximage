@@ -13,7 +13,6 @@ from django.contrib.admin.templatetags.admin_static import static
 from django.contrib.admin.views.decorators import staff_member_required
 from django.core.files.storage import default_storage
 from django.http import HttpResponse
-from django.utils.text import slugify
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 
@@ -23,10 +22,6 @@ from .forms import FileForm
 
 UPLOAD_PATH = getattr(
         settings, 'AJAXIMAGE_DIR', 'ajaximage/')
-AUTH_TEST = getattr(
-        settings, 'AJAXIMAGE_AUTH_TEST', lambda u: u.is_staff)
-FILENAME_NORMALIZER = getattr(
-        settings, 'AJAXIMAGE_FILENAME_NORMALIZER', slugify)
 
 
 @csrf_exempt
@@ -59,10 +54,13 @@ def ajaximage(request, upload_to=None, max_width=None, max_height=None,
         file_ = resize(file_, max_width, max_height, crop)
 
         #remove acentuação#
-        nome_arquivo = normalize('NFKD', str(file_.name)).encode('ascii', 'ignore').lower()
+        nome_arquivo = normalize('NFKD', file_.name).encode('ascii', 'ignore').lower()
 
         #remove espaçamentos extras e substitui " " por "_"#
-        nome_arquivo = re.sub(r'\s+', ' ', nome_arquivo.decode()).replace(' ','_')
+        nome_arquivo = nome_arquivo.decode()\
+                            if isinstance(nome_arquivo, bytes)\
+                            else nome_arquivo
+        nome_arquivo = re.sub(r'\s+', ' ', nome_arquivo).replace(' ','_')
 
         #nome e extensão#
         arquivo, extensao = os.path.splitext(nome_arquivo)
