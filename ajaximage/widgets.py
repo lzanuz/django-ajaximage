@@ -1,18 +1,23 @@
+# -*- coding: utf-8 -*-
+
 import os
+
+from django.contrib.admin.templatetags.admin_static import static
 from django.forms import widgets
 from django.utils.safestring import mark_safe
 from django.core.urlresolvers import reverse
-from django.core.files.storage import default_storage
+
+from easy_thumbnails.files import get_thumbnailer
 
 
 class AjaxImageWidget(widgets.TextInput):
 
-    html = """
+    html = '''
     <div class="ajaximage">
-        <a class="file-link" target="_blank" href="{file_url}">
+        <a class="file-link" target="_blank" href="{file_name}">
             <img class="file-img" src="{file_url}">
         </a>
-        <a class="file-remove" href="#remove">Remove</a>
+        <a class="file-remove" href="#remove">Modificar Foto</a>
         <input class="file-path" type="hidden" value="{file_path}" id="{element_id}" name="{name}" />
         <input type="file" class="file-input" />
         <input class="file-dest" type="hidden" value="{upload_url}">
@@ -20,7 +25,7 @@ class AjaxImageWidget(widgets.TextInput):
             <div class="bar"></div>
         </div>
     </div>
-    """
+    '''
 
     class Media:
         js = (
@@ -55,16 +60,44 @@ class AjaxImageWidget(widgets.TextInput):
         # value.url fails when rendering form with validation errors because
         # form value is not a FieldFile. Use storage.url and file_path - works
         # with FieldFile instances and string formdata
+
+        #file_path = str(value) if value else ''
+        #file_url = default_storage.url(file_path) if value else ''
+
+        #file_name = os.path.basename(file_url)
+
+        #output = self.html.format(upload_url=upload_url,
+        #                     file_url=file_url,
+        #                     file_name=file_name,
+        #                     file_path=file_path,
+        #                     element_id=element_id,
+        #                     name=name)
+
+        #INICIO thumbs para fields ajaximage#
+        #modificado também self.html#
+
         file_path = str(value) if value else ''
-        file_url = default_storage.url(file_path) if value else ''
+
+        file_url = hasattr(value, 'url') and value.url or value or ''
 
         file_name = os.path.basename(file_url)
 
-        output = self.html.format(upload_url=upload_url,
-                             file_url=file_url,
-                             file_name=file_name,
-                             file_path=file_path,
-                             element_id=element_id,
-                             name=name)
+        if value and self.upload_to == 'fotos':
+            thumb_url = static(get_thumbnailer(value)['admin_imovel_fieldsets'].url)
+            foto_url = static(get_thumbnailer(value)['imovel_fotos'].url)
+
+        if value and self.upload_to == 'slides':
+            thumb_url = static(get_thumbnailer(value)['admin_slides_thumb'].url)
+            foto_url = static(file_url)
+
+        output = self.html.format(
+                    upload_url=upload_url,
+                    file_url=file_url and thumb_url or file_url,
+                    file_name=file_name and foto_url or file_url,
+                    file_path=file_path,
+                    element_id=element_id,
+                    name=name)
+
+        #FIM#
 
         return mark_safe(output)
