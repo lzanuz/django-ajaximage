@@ -15,12 +15,12 @@ class AjaxImageWidget(widgets.TextInput):
     html = '''
     <div class="ajaximage">
         <a class="file-link" target="_blank" href="{file_name}">
-            <img class="file-img" src="{file_url}">
+            <img class="file-img" src="{file_url}" alt="" />
         </a>
         <a class="file-remove" href="#remove">Modificar Foto</a>
         <input class="file-path" type="hidden" value="{file_path}" id="{element_id}" name="{name}" />
         <input type="file" class="file-input" />
-        <input class="file-dest" type="hidden" value="{upload_url}">
+        <input class="file-dest" type="hidden" value="{upload_url}" />
         <div class="progress progress-striped active">
             <div class="bar"></div>
         </div>
