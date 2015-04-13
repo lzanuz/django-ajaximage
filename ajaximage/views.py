@@ -84,6 +84,7 @@ def ajaximage(request, upload_to=None, max_width=None, max_height=None,
 
         return HttpResponse(json.dumps(
                     {'url': static(get_thumbnailer(url)[upload_thumb[upload_to]].url),
-                     'filename': file_path}))
+                     'filename': file_path}),
+                content_type='application/json')
 
     return HttpResponse(status=403)
