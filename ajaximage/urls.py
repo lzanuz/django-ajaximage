@@ -2,12 +2,14 @@
 
 from django.conf.urls import url
 
+from ajaximage import views
+
 
 patterns = [
 
     url(
         '^upload/(?P<upload_to>.*)/(?P<max_width>\d+)/(?P<max_height>\d+)/(?P<crop>\d+)',
-        'ajaximage.views.ajaximage',
+        views.ajaximage,
         name='ajaximage'
     ),
 
