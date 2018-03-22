@@ -4,8 +4,8 @@ import os
 
 from django.contrib.admin.templatetags.admin_static import static
 from django.forms import widgets
+from django.urls import reverse
 from django.utils.safestring import mark_safe
-from django.core.urlresolvers import reverse
 
 from easy_thumbnails.files import get_thumbnailer
 
